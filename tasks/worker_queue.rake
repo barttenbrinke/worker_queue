@@ -5,8 +5,7 @@ namespace :worker_queue do
 
   desc 'Start the worker'
   task :work => :environment do
-    worker = WorkerQueue::WorkerQueue.new
-    worker.work
+    WorkerQueue::WorkerQueue.work if WorkerQueue::WorkerQueue.work?
   end
 
 end
