@@ -60,8 +60,9 @@ class WorkerQueue
       return WorkerQueue.waiting_tasks.include?(self) && !self.completed? && !self.running?    
     end
 
+    # This prevents us selecting the binary field for a simple status lookup
     def self.partial_select_attributes
-      'id, status, class_name, updated_at, deleted_at, created_by, lock_version, updated_by, task_name, error_message, task_group, method_name, created_at, filename, argument_hash'
+      'id, status, class_name, updated_at, created_at, task_name, error_message, task_group, method_name, filename, argument_hash'
     end
 
   end
