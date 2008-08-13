@@ -1,0 +1,79 @@
+Bart ten Brinke - Nedap healthcare - 2008
+
+-----------
+Description
+-----------
+As I found things like background rb to unstable or to memory hogging, I decided to make this.
+It is a very simple task scheduler for rails.
+
+
+-----------
+Installation
+-----------
+
+git clone git://github.com/barttenbrinke/worker_queue.git vendor/plugins/worker_queue
+
+
+-----------
+Usage
+-----------
+Whenever you want to background a task, just do the following:
+  work = WorkerQueue::WorkerQueueItem.new
+  work.class_name     = 'Someclass'
+  work.method_name    = 'somemethod'
+  work.argument_hash  = {:monkey => :tail}
+  work.binary_data    = '1234567890'
+  work.save!
+
+This will be picked up by the worker when the following command is called:
+  WorkerQueue.work
+  
+  Which in turn will call:
+  Someclass.somemethod({:monkey => :tail, :binary_data => '1234567890')
+    
+It is advised set up a cronjob that runs the supplied rake task:
+  rake worker_queue:work
+
+Note that workerqueue will run only one task of a single class at the same time.
+So if you want to queue a execute the items one after the other, make sure all items are set
+to the same class.
+This is also very usefull for things like uploaded files that need to be handled in the order in which
+they were uploaded.
+
+If you just want to execute items in the background, enter a unique classname for each item and
+WorkerQueue will try its best to complete.
+
+After the workerqueue has executed a task successfully, it will clear the binary (if any) and move on
+to the next item. WorkerQueue has no problem with multiple instances of it being run a the same time.
+
+Use the following migration to get the show on the road:
+
+class CreateWorkerQueueItems < ActiveRecord::Migration
+  def self.up
+    create_table :worker_queue_items, :options => 'ENGINE=InnoDB DEFAULT CHARSET=UTF8' do |t|
+      t.column :task_name, :string
+      t.column :task_group, :string
+      t.column :class_name, :string
+      t.column :method_name, :string
+      t.column :argument_hash, :text
+      t.column :binary_data, :binary
+      t.column :running, :boolean, :default => 0
+      t.column :completed, :boolean, :default => 0
+      t.column :error, :boolean, :default => 0
+      t.column :error_message, :string
+    end
+  end
+
+  def self.down
+    drop_table :worker_queue_items
+  end
+end
+
+
+-----------
+Final Notes
+-----------
+- The specs only run in a rails project with the WorkerQueue plugin installed. This needs fixing.
+- If you want to store big files in the binary_data field, make sure you MYSQL config accepts inserts that are big enough.
+- That the tasks that get executed expect a Class.method(args_hash, binary_blob) that returns true
+or false.
