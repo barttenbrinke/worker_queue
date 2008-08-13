@@ -52,9 +52,10 @@ class WorkerQueue
     # Check if we can execute ourselves
     def executable?
       if self.id
-        old_lock = self.lock_version
+        old_updated_at = self.updated_at
         self.reload
-        return false if old_lock != self.lock_version
+
+        return false if old_updated_at != self.updated_at
       end
         
       return WorkerQueue.waiting_tasks.include?(self) && !self.completed? && !self.running?    
