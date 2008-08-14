@@ -60,7 +60,7 @@ class WorkerQueue
       return WorkerQueue.waiting_tasks.include?(self) && !self.completed? && !self.running?    
     end
 
-    # This prevents us selecting the binary field for a simple status lookup
+    # This prevents us fetching the data field for a simple status lookup
     def self.partial_select_attributes
       (WorkerQueue::WorkerQueueItem.columns.collect{|x| x.name} - ['data']).join(',')
     end
