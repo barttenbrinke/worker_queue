@@ -54,10 +54,9 @@ class WorkerQueue
       if self.id
         old_lock_version = self.lock_version
         self.reload
-
         return false if old_lock_version != self.lock_version
       end
-        
+      
       return WorkerQueue.waiting_tasks.include?(self) && !self.completed? && !self.running?    
     end
 

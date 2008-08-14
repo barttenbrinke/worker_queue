@@ -187,3 +187,46 @@ describe "work?" do
   end
 
 end
+
+
+describe "When handling racing conditions" do
+  before(:each) do
+    WorkerQueue::WorkerQueueItem.destroy_all
+    
+    @item = WorkerQueue::WorkerQueueItem.new
+    @item.task_name      = '1234567890'
+    @item.task_group     = 'some_group'
+    @item.status         = WorkerQueue::WorkerQueueItem::STATUS_RUNNING
+
+    @item.class_name     = 'WorkerQueue::WorkerTester'
+    @item.method_name    = 'test'
+    @item.argument_hash  = {:aap => :noot}
+    @item.data           = '1234567890'
+    @item.lock_version   = 1
+    @item.save!
+  end
+
+  it "should not execute an executing object" do
+    WorkerQueue::WorkerTester.should_receive(:test).exactly(0).times
+
+    @item.lock_version = 0
+    @item.status = WorkerQueue::WorkerQueueItem::STATUS_WAITING
+    
+    WorkerQueue.work([@item])
+    @item.reload
+    @item.status.should eql(WorkerQueue::WorkerQueueItem::STATUS_RUNNING)
+  end
+
+  it "should not execute when the object when it is stale" do
+    WorkerQueue::WorkerTester.should_receive(:test).exactly(0).times
+
+    @item.lock_version = 0
+    @item.status = WorkerQueue::WorkerQueueItem::STATUS_WAITING
+    @item.stub!(:executable?).and_return(true)
+
+    WorkerQueue.work([@item])
+    @item.reload
+    @item.status.should eql(WorkerQueue::WorkerQueueItem::STATUS_RUNNING)
+  end
+
+end

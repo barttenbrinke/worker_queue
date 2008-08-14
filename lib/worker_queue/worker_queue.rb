@@ -21,7 +21,7 @@ class WorkerQueue
       # Start off by flagging the task as running.
       begin
         # Check if we are still allowed to do this task
-        next unless task.executable?
+        next unless task.executable?      
         task.status = WorkerQueue::WorkerQueueItem::STATUS_RUNNING
         task.save!
       rescue ActiveRecord::StaleObjectError
