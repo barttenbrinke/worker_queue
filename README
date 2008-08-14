@@ -62,6 +62,7 @@ class CreateWorkerQueueItems < ActiveRecord::Migration
       t.column :status, :integer, :default => 0
       t.column :error_message, :string
       t.column :filename, :string
+      t.column :lock_version, :integer, :default => 0
       
       t.timestamps
     end

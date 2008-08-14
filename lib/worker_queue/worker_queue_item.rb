@@ -52,10 +52,10 @@ class WorkerQueue
     # Check if we can execute ourselves
     def executable?
       if self.id
-        old_updated_at = self.updated_at
+        old_lock_version = self.lock_version
         self.reload
 
-        return false if old_updated_at != self.updated_at
+        return false if old_lock_version != self.lock_version
       end
         
       return WorkerQueue.waiting_tasks.include?(self) && !self.completed? && !self.running?    
@@ -63,7 +63,7 @@ class WorkerQueue
 
     # This prevents us selecting the binary field for a simple status lookup
     def self.partial_select_attributes
-      'id, status, class_name, updated_at, created_at, task_name, error_message, task_group, method_name, filename, argument_hash'
+      (WorkerQueue::WorkerQueueItem.columns.collect{|x| x.name} - ['data']).join(',')
     end
 
   end

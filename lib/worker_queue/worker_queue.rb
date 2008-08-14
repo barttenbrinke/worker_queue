@@ -24,7 +24,7 @@ class WorkerQueue
         next unless task.executable?
         task.status = WorkerQueue::WorkerQueueItem::STATUS_RUNNING
         task.save!
-      rescue
+      rescue ActiveRecord::StaleObjectError
         # The task has changed, so it was probably picked up by some other worker.
         # Skip to the next task
         next
