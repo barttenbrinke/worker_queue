@@ -38,12 +38,15 @@ This will be picked up by the worker when the following command is called:
     
 It is advised too set up a cronjob that runs the supplied rake task:
   rake worker_queue:work
+  
+Let this run as freqently as possible. WorkerQueue will have no problem if it is instantiated
+multiple times.
 
 Note that WorkerQueue will run only one task of a single class at the same time.
-So if you want to queue a execute the items one after the other, make sure all items are set
+So if you want to queue and execute the items one after the other, make sure all items are set
 to the same class.
-This is also very useful for things like uploaded files that need to be handled in the order in which
-they were uploaded.
+This is also very usefull for things like xml files that need to be handled in the order in
+which they were uploaded.
 
 If you just want to execute items in the background, supply a unique classname for each item and
 WorkerQueue will try its best to complete them as fast as possible.
