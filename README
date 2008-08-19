@@ -4,16 +4,20 @@ Bart ten Brinke - Nedap healthcare - 2008
 Description
 -----------
 As I found other Rails background project to unstable, complex or too memory hogging, I decided to make this.
-WorkerQueue can handle large amounts of data, perform tasks on a separate machine and can execute tasks
-either in parallel or in sequence. Got Work?
+WorkerQueue can execute any task, handle large amounts of data, perform tasks on a separate machine and execute
+tasks either in parallel or in sequence. Got Work?
 
 
 -----------
 Installation
 -----------
 
-git clone git://github.com/barttenbrinke/worker_queue.git vendor/plugins/worker_queue
+Clone the WorkerQueue repostitory
+  git clone git://github.com/barttenbrinke/worker_queue.git vendor/plugins/worker_queue
 
+Switch to the 1_0_stable branch if you don't like living on the edge.
+  cd vendor/plugins/worker_queue
+  git branch 1_0_stable
 
 -----------
 Usage
@@ -63,7 +67,6 @@ class CreateWorkerQueueItems < ActiveRecord::Migration
       t.column :error_message, :string
       t.column :filename, :string
       t.column :lock_version, :integer, :default => 0, :null => false
-      
       t.timestamps
     end
     
@@ -80,11 +83,11 @@ end
 -----------
 Notes
 -----------
-- The specs only run in a rails project with the WorkerQueue, rspec and rspec_on_rails plugins installed.
+* The specs only run in a rails project with the WorkerQueue, rspec and rspec_on_rails plugins installed.
   This needs fixing.
 
-- If you want to store big files in the binary_data field, make sure you MYSQL config accepts
+* If you want to store big files in the binary_data field, make sure you MYSQL config accepts
 inserts that are big enough.
 
-- The tasks that get executed expect a Class.method(args_hash, binary_blob) that returns true
+* The tasks that get executed expect a Class.method(args_hash, binary_blob) that returns true
   or false.
