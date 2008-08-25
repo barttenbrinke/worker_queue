@@ -45,30 +45,25 @@ class WorkerQueue
     (tasks - running_tasks).reject{|x| running_groups.include?(x.task_group)}
   end
   
-  # Are there any items to process?
+  # Are there any tasks to process?
   def self.work?
     waiting_tasks.length > 0
   end
 
   # Find tasks with a certain flag uncompleted tasks in the database
   def self.all_waiting_tasks
-    WorkerQueue::WorkerQueueItem.find(
-                                      :all,
-                                      :order => 'id',
-                                      :conditions => ['status = ?', WorkerQueue::WorkerQueueItem::STATUS_WAITING],
-                                      :select => WorkerQueue::WorkerQueueItem.partial_select_attributes
-                                     )
+    WorkerQueue::WorkerQueueItem.all_waiting_tasks(
+      :order => 'id',
+      :select => WorkerQueue::WorkerQueueItem.partial_select_attributes
+    )
   end
 
   # Find all tasks being worked on at the moment.
   def self.all_busy_tasks
-    WorkerQueue::WorkerQueueItem.find(
-                                      :all,
-                                      :order => 'id',
-                                      :conditions => ['status = ? OR status = ?', WorkerQueue::WorkerQueueItem::STATUS_RUNNING,
-                                                                                  WorkerQueue::WorkerQueueItem::STATUS_ERROR], 
-                                      :select => WorkerQueue::WorkerQueueItem.partial_select_attributes
-                                     )
+    WorkerQueue::WorkerQueueItem.all_busy_tasks(
+      :order => 'id',
+      :select => WorkerQueue::WorkerQueueItem.partial_select_attributes
+    )
   end
   
 end
