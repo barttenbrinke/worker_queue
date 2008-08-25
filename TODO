@@ -1,0 +1,2 @@
+- Named finders
+- WorkerQueue, now does either parallel or sequential execution. Add 3rd variant: max sequential per class_name.
