@@ -1,4 +1,10 @@
 The following things need to be done:
 
-- Named finders (causes problems with un-initialized WorkerQueueclass, needs solution)
-- Max parallalization: WQ now does either parallel or sequential execution. It needs a 3rd variant: max sequential per class_name.
+- Named finders
+    Just adding a named finder causes problems with un-initialized WorkerQueueClass attributes.
+    This needs an elegant solution.
+    
+- Maximum parallalization
+    WorkerQueue now does either parallel or sequential execution.
+    A maximum amount of parallel running Workers per class_name would be nice.
+    For example: a user can have a maximum of 5 reports running in parallel.
