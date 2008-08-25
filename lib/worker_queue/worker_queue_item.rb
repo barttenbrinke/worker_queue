@@ -1,18 +1,26 @@
 class WorkerQueue
   class WorkerQueueItem < ActiveRecord::Base
     
-    named_scope :all_waiting_tasks, lambda { {:conditions => ['status = ?', STATUS_WAITING]} }
-    named_scope :all_busy_tasks, lambda { {:conditions => ['status = ? OR status = ?', STATUS_RUNNING, STATUS_ERROR]} }
-    
-    validate :hash_in_argument_hash  
-    serialize :argument_hash, Hash
-    
     # Status messages
     STATUS_WAITING    = 0
     STATUS_RUNNING    = 1
     STATUS_ERROR      = 2
     STATUS_COMPLETED  = 3
   
+    named_scope :waiting,
+      lambda {{ :conditions => {:status => STATUS_WAITING} }}
+    named_scope :running,
+      lambda {{ :conditions => {:status => STATUS_RUNNING} }}
+    named_scope :errors,
+      lambda {{ :conditions => {:status => STATUS_ERROR} }}
+    named_scope :completed,
+      lambda {{ :conditions => {:status => STATUS_COMPLETED} }}
+    named_scope :busy,
+      lambda { {:conditions => ['status = ? OR status = ?', STATUS_RUNNING, STATUS_ERROR]} }
+    
+    validate :hash_in_argument_hash  
+    serialize :argument_hash, Hash
+    
     # Execute ourselves
     # Note that the task executed expects Class.method(args_hash, binary_blob) to return true or false.
     # Options
@@ -60,7 +68,7 @@ class WorkerQueue
       end
       
       # Return true we can sill be executed
-      return WorkerQueue.waiting_tasks.include?(self) && !self.completed? && !self.running?    
+      return WorkerQueue.available_tasks.include?(self) && !self.completed? && !self.running?    
     end
 
     # Validates hash in the argument_hash attribute. If none found, a hash is inserted.
@@ -69,9 +77,27 @@ class WorkerQueue
       return true
     end
     
+    # Class methods
+    
     # This prevents us fetching the data field for a simple status lookup
     def self.partial_select_attributes
-      (WorkerQueue::WorkerQueueItem.columns.collect{|x| x.name} - ['data']).join(',')
+      (columns.collect{|x| x.name} - ['data']).join(',')
+    end
+
+    # Find tasks with a certain flag uncompleted tasks in the database
+    def self.waiting_tasks
+      waiting(
+        :order => 'id',
+        :select => WorkerQueue::WorkerQueueItem.partial_select_attributes
+      )
+    end
+
+    # Find all tasks being worked on at the moment.
+    def self.busy_tasks
+      busy(
+        :order => 'id',
+        :select => WorkerQueue::WorkerQueueItem.partial_select_attributes
+      )
     end
 
   end

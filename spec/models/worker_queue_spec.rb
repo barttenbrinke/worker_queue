@@ -26,11 +26,11 @@ describe "waiting tasks" do
 
   it "should not crash on an empty set" do
     WorkerQueue::WorkerQueueItem.destroy_all
-    WorkerQueue.waiting_tasks([]).should eql([])
+    WorkerQueue.available_tasks([]).should eql([])
   end
 
   it "should find all waiting tasks" do
-    WorkerQueue.waiting_tasks.length.should eql(10)
+    WorkerQueue.available_tasks.length.should eql(10)
   end
 
   it "should filter out all running tasks of the same type" do
@@ -41,14 +41,14 @@ describe "waiting tasks" do
     @worker_queue[0].save
     @worker_queue[1].save
     
-    WorkerQueue.waiting_tasks.length.should eql(8)
+    WorkerQueue.available_tasks.length.should eql(8)
   end
 
   it "should filter out all running tasks is they are all the same type" do
     @worker_queue[0].status = WorkerQueue::WorkerQueueItem::STATUS_RUNNING
     @worker_queue[0].save
     
-    WorkerQueue.waiting_tasks.length.should eql(0)
+    WorkerQueue.available_tasks.length.should eql(0)
   end
   
   it "should order all waiting tasks in the correct order" do
@@ -56,7 +56,7 @@ describe "waiting tasks" do
     @worker_queue[1].task_group = 'other_group'
     @worker_queue[1].status = WorkerQueue::WorkerQueueItem::STATUS_WAITING
 
-    queue = WorkerQueue.waiting_tasks
+    queue = WorkerQueue.available_tasks
     1.upto(6) do |number|
       queue[number].id.should > queue[number-1].id
     end
@@ -110,7 +110,7 @@ describe "work" do
     @worker_queue[0].save
     WorkerQueue.work
     
-    tasks = WorkerQueue::WorkerQueueItem.find_all_by_status(WorkerQueue::WorkerQueueItem::STATUS_ERROR)
+    tasks = WorkerQueue::WorkerQueueItem.errors
     tasks.length.should eql(1)
 
     tasks[0].error_message.should_not be_nil
@@ -121,7 +121,7 @@ describe "work" do
     @worker_queue[0].save
     WorkerQueue.work
     
-    tasks = WorkerQueue::WorkerQueueItem.find_all_by_status(WorkerQueue::WorkerQueueItem::STATUS_ERROR)
+    tasks = WorkerQueue::WorkerQueueItem.errors
     tasks.length.should eql(1)
 
     tasks[0].error_message.should_not be_nil
@@ -131,15 +131,15 @@ describe "work" do
     WorkerQueue::WorkerTester.stub!(:test).and_return(false)
     WorkerQueue.work
 
-    tasks = WorkerQueue::WorkerQueueItem.find_all_by_status(WorkerQueue::WorkerQueueItem::STATUS_ERROR)
+    tasks = WorkerQueue::WorkerQueueItem.errors
     tasks.length.should eql(1)
     tasks[0].error_message.should_not be_nil
 
-    tasks = WorkerQueue::WorkerQueueItem.find_all_by_status(WorkerQueue::WorkerQueueItem::STATUS_WAITING)
+    tasks = WorkerQueue::WorkerQueueItem.waiting
     tasks.length.should eql(9)
     
     # No remainder of the group should be executable.
-    WorkerQueue.waiting_tasks.length.should eql(0)
+    WorkerQueue.available_tasks.length.should eql(0)
   end
   
 end
