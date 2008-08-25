@@ -18,6 +18,10 @@ Clone the WorkerQueue repostitory
 Switch to the 1_0_stable branch if you don't like living on the edge.
   cd vendor/plugins/worker_queue
   git branch 1_0_stable
+  
+Use the following migration to get the show on the road:
+  ruby script/generate worker_queue_migration
+
 
 -----------
 Usage
@@ -53,10 +57,6 @@ WorkerQueue will try its best to complete them as fast as possible.
 
 After the WorkerQueue has executed a task successfully, it will clear the binary (if any) and move on
 to the next item. WorkerQueue has no problem with multiple instances of it being run a the same time.
-
-Use the following migration to get the show on the road:
-
-ruby script/generate worker_queue_migration
 
 -----------
 Notes
