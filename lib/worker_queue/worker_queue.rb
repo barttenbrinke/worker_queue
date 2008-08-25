@@ -52,16 +52,23 @@ class WorkerQueue
 
   # Find tasks with a certain flag uncompleted tasks in the database
   def self.all_waiting_tasks
-    WorkerQueue::WorkerQueueItem.find(:all, :order => 'id', :conditions => ['status = ?', WorkerQueue::WorkerQueueItem::STATUS_WAITING],
-                                      :select => WorkerQueue::WorkerQueueItem.partial_select_attributes)
+    WorkerQueue::WorkerQueueItem.find(
+                                      :all,
+                                      :order => 'id',
+                                      :conditions => ['status = ?', WorkerQueue::WorkerQueueItem::STATUS_WAITING],
+                                      :select => WorkerQueue::WorkerQueueItem.partial_select_attributes
+                                     )
   end
 
   # Find all tasks being worked on at the moment.
   def self.all_busy_tasks
-    WorkerQueue::WorkerQueueItem.find(:all, :order => 'id',
-            :conditions => ['status = ? OR status = ?', WorkerQueue::WorkerQueueItem::STATUS_RUNNING, WorkerQueue::WorkerQueueItem::STATUS_ERROR], 
-            :select => WorkerQueue::WorkerQueueItem.partial_select_attributes)
+    WorkerQueue::WorkerQueueItem.find(
+                                      :all,
+                                      :order => 'id',
+                                      :conditions => ['status = ? OR status = ?', WorkerQueue::WorkerQueueItem::STATUS_RUNNING,
+                                                                                  WorkerQueue::WorkerQueueItem::STATUS_ERROR], 
+                                      :select => WorkerQueue::WorkerQueueItem.partial_select_attributes
+                                     )
   end
   
-
 end

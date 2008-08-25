@@ -1,2 +1,2 @@
-- Named finders
-- WorkerQueue, now does either parallel or sequential execution. Add 3rd variant: max sequential per class_name.
+- Named finders (causes problems with un-initialized WorkerQueueclass, needs sollution)
+- Max parallalization: WQ now does either parallel or sequential execution. Needs a 3rd variant: max sequential per class_name.

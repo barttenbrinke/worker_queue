@@ -36,14 +36,17 @@ class WorkerQueue
       end
     end
     
+    # Check if this task is running
     def running?
       self.status == STATUS_RUNNING
     end
     
+    # Check if the task is completed
     def completed?
       self.status == STATUS_COMPLETED
     end
     
+    # Validates hash in the argument_hash attribute. If none found, a hash is inserted.
     def hash_in_argument_hash
       self.argument_hash = {} if self.argument_hash.nil?
       return true
