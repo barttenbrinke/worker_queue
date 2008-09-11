@@ -5,9 +5,10 @@ namespace :worker_queue do
 
   desc 'Load worker items'
   task :load => :environment do
-    Dir.glob("#{RAILS_ROOT}/lib/worker_queue/*.rb").each do |file|
+    Dir.glob("#{RAILS_ROOT}/lib/worker_queue/**/*.rb").each do |file|
       require file
-      Object.const_get(File.basename(file,'.rb').classify).load
+      class_name = file.sub(/^#{RAILS_ROOT}\/lib\/worker_queue\/(.*)\.rb$/,'\1').classify
+      class_name.split('::').inject(Object) { | klass, const | klass.const_get(const) }.load
     end
   end
 
