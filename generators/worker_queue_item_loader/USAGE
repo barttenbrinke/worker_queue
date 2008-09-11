@@ -1,0 +1,21 @@
+Description:
+---
+
+  The 'worker_queue_item_loader' generator creates stubs for a new worker_queue_item
+  loader.
+
+  The generator takes the loader's name as its argument. The loader's name may be
+  given in CamelCase or under_score and should not be suffixed with 'Loader'.
+
+  The generator creates a loader class in lib/worker_queue dir.
+
+Example:
+---
+
+  ./script/generate worker_queue_item_loader Misc::UpdateSessionTicket
+  ./script/generate worker_queue_item_loader misc/update_session_ticket
+
+  Both of the above would create the same loader at: 
+
+  - lib/worker_queue/misc/update_session_ticket_loader.rb
+
