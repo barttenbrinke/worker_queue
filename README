@@ -58,6 +58,14 @@ WorkerQueue will try its best to complete them as fast as possible.
 After the WorkerQueue has executed a task successfully, it will clear the binary (if any) and move on
 to the next item. WorkerQueue has no problem with multiple instances of it being run a the same time.
 
+To ease defining and adding worker_queue items, we introduce the worker_queue item loaders, which 
+can be created using:
+  ruby script/generate worker_queue_item_loader do_something
+
+Such loaders can be automatically loaded and executed (by cronjobs) using:
+  rake worker_queue:load_and_work
+
+
 -----------
 Notes
 -----------
