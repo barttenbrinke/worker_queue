@@ -49,5 +49,14 @@ class WorkerQueue
   def self.work?
     available_tasks.length > 0
   end
-  
+
+  # Load the worker_queue items under <RAILS_ROOT>/lib/worker_queue
+  def self.load
+    Dir.glob("#{RAILS_ROOT}/lib/worker_queue/**/*.rb").each do |file|
+      require file
+      class_name = file.sub(/^#{RAILS_ROOT}\/lib\/worker_queue\/(.*)\.rb$/,'\1').classify
+      class_name.split('::').inject(Object) { | klass, const | klass.const_get(const) }.load
+    end
+  end
+
 end
