@@ -1,4 +1,4 @@
-# $Id: NgTzeYang [nineone@singnet.com.sg] 11 Sep 2008 15:48 $
+# $Id: NgTzeYang [nineone@singnet.com.sg] 15 Sep 2008 18:38 $
 #
 # Intended to be inherited by all work loaders. Usage:
 #
@@ -37,7 +37,7 @@ class WorkerQueue
     protected
 
       def self.prepare
-        raise "Subclass MUST implement prepare()"
+        raise self.to_s + ".prepare() MUST be implemented"
       end
 
   end
