@@ -52,11 +52,16 @@ class WorkerQueue
 
   # Load the worker_queue items under <RAILS_ROOT>/lib/worker_queue
   def self.load
-    Dir.glob("#{RAILS_ROOT}/lib/worker_queue/**/*.rb").each do |file|
+    Dir.glob(File.join( loaders_lib, '**', '*.rb' )).each do |file|
       require file
-      class_name = file.sub(/^#{RAILS_ROOT}\/lib\/worker_queue\/(.*)\.rb$/,'\1').classify
-      class_name.split('::').inject(Object) { | klass, const | klass.const_get(const) }.load
+      file.sub(/^#{Regexp.escape(loaders_lib)}(.*)\.rb$/,'\1').classify.constantize.load
     end
   end
+
+  # Path where worker_queue item loaders are placed
+  def self.loaders_lib
+    File.join( RAILS_ROOT, 'lib', 'worker_queue', '' )
+  end
+
 
 end
