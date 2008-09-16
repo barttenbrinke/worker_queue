@@ -8,25 +8,20 @@ class WorkerQueue
     STATUS_COMPLETED  = 3
     STATUS_SKIPPED    = 4 
 
-    named_scope :waiting,
-      lambda {{ :conditions => {:status => STATUS_WAITING} }}
-    named_scope :running,
-      lambda {{ :conditions => {:status => STATUS_RUNNING} }}
-    named_scope :errors,
-      lambda {{ :conditions => {:status => STATUS_ERROR} }}
-    named_scope :completed,
-      lambda {{ :conditions => {:status => STATUS_COMPLETED} }}
-    named_scope :busy,
-      lambda { {:conditions => ['status = ? OR status = ?', STATUS_RUNNING, STATUS_ERROR]} }
+    named_scope :waiting,   :conditions => {:status => 0} # STATUS_WAITING
+    named_scope :running,   :conditions => {:status => 1} # STATUS_RUNNING
+    named_scope :errors,    :conditions => {:status => 2} # STATUS_ERROR
+    named_scope :completed, :conditions => {:status => 3} # STATUS_COMPLETED
+    named_scope :skipped,   :conditions => {:status => 4} # STATUS_SKIPPED
+    named_scope :busy,      :conditions => ['status = ? OR status = ?', 1, 2] # STATUS_RUNNING STATUS_ERROR
     
     validate :hash_in_argument_hash  
     serialize :argument_hash, Hash
     
     # Execute ourselves
-    # Note that the task executed expects Class.method(args_hash, binary_blob) to return true or false.
+    # Note that the task executed expects Class.method(args_hash) to return true or false.
     # Options
     # *<tt>:keep_data</tt> Do not empty the data on completion.
-    # *<tt>:skip_on_error</tt> Do not stop the execution of a group when an error was encountered.
     def execute(options = {})
       
       ah = argument_hash.clone
@@ -44,7 +39,7 @@ class WorkerQueue
       
       # If we have an error, do not run anything in this group (halt the chain)
       if error?
-        self.status   = STATUS_SKIPPED if options[:skip_on_error]
+        self.status   = STATUS_SKIPPED if skip_on_error
       else
         self.status   = STATUS_COMPLETED
         self.data     = nil unless !!options[:keep_data]

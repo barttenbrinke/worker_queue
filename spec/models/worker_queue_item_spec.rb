@@ -188,7 +188,6 @@ describe "work?" do
 
 end
 
-
 describe "When handling racing conditions" do
   before(:each) do
     WorkerQueue::WorkerQueueItem.destroy_all
@@ -228,5 +227,4 @@ describe "When handling racing conditions" do
     @item.reload
     @item.status.should eql(WorkerQueue::WorkerQueueItem::STATUS_RUNNING)
   end
-
 end
