@@ -72,5 +72,5 @@ Notes
 * If you want to store big files in the binary_data field, make sure you MYSQL config accepts
 inserts that are big enough.
 
-* The tasks that get executed expect a Class.method(args_hash, binary_blob) that returns true
+* The tasks that get executed expect a Class.method(args_hash) that returns true
   or false.
