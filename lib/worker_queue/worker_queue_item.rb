@@ -61,6 +61,10 @@ class WorkerQueue
       self.status == STATUS_COMPLETED
     end
     
+    def error?
+      self.status == STATUS_ERROR
+    end
+    
     # Check if we can execute ourselves
     def executable?
       
