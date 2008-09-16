@@ -1,11 +1,10 @@
 The following things need to be done:
 
-- Named finders
-    Just adding a named finder causes problems with un-initialized WorkerQueueClass attributes.
-    This needs an elegant solution.
-    
 - Maximum parallalization
     WorkerQueue now does either parallel or sequential execution.
     A maximum amount of parallel running Workers per class_name would be nice.
     For example: a user can have a maximum of 5 reports running in parallel.
     
+- Spec suite
+    The specs only run in a rails project with the WorkerQueue, rspec and rspec_on_rails plugins installed.
+

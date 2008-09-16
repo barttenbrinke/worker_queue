@@ -17,6 +17,7 @@ def self.prepare
   # work.method_name    = 'some_method'
   # work.argument_hash  = { :some_arg => :some_val }
   # work.binary_data    = '1234567890'
+  # work.skip_on_error  = false
   #
 end 
 /.strip.gsub( "\n", "\n#{indent}" )

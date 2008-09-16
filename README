@@ -31,19 +31,19 @@ Whenever you want to background a task, just do the following:
   work.class_name     = 'Someclass'
   work.method_name    = 'some_method'
   work.argument_hash  = {:monkey => :tail}
-  work.binary_data    = '1234567890'
+  work.data    = '1234567890'
   work.save!
 
 This will be picked up by the worker when the following command is called:
   WorkerQueue.work
   
   Which in turn will call:
-  Someclass.some_method({:monkey => :tail, :binary_data => '1234567890')
+  Someclass.some_method({:monkey => :tail, :data => '1234567890')
     
 It is advised too set up a cronjob that runs the supplied rake task:
   rake worker_queue:work
   
-Let this run as freqently as possible. WorkerQueue will have no problem if it is instantiated
+Let this run as frequently as possible. WorkerQueue will have no problem if it is instantiated
 multiple times.
 
 Note that WorkerQueue will run only one task of a single class at the same time.
@@ -69,9 +69,6 @@ Such loaders can be automatically loaded and executed (by cronjobs) using:
 -----------
 Notes
 -----------
-* The specs only run in a rails project with the WorkerQueue, rspec and rspec_on_rails plugins installed.
-  This needs fixing.
-
 * If you want to store big files in the binary_data field, make sure you MYSQL config accepts
 inserts that are big enough.
 
