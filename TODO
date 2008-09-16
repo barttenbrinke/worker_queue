@@ -8,3 +8,4 @@ The following things need to be done:
     WorkerQueue now does either parallel or sequential execution.
     A maximum amount of parallel running Workers per class_name would be nice.
     For example: a user can have a maximum of 5 reports running in parallel.
+    
