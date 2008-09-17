@@ -65,6 +65,8 @@ can be created using:
 Such loaders can be automatically loaded and executed (by cronjobs) using:
   rake worker_queue:load_and_work
 
+For more examples, see the USAGE file
+
 
 -----------
 Notes

@@ -8,3 +8,5 @@ The following things need to be done:
 - Spec suite
     The specs only run in a rails project with the WorkerQueue, rspec and rspec_on_rails plugins installed.
 
+- USAGE
+    Check if examples actually work.

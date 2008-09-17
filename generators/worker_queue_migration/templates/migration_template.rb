@@ -9,7 +9,7 @@ class CreateWorkerQueueItems < ActiveRecord::Migration
       t.column :data, :text
       t.column :start, :datetime
       t.column :status, :integer, :default => 0, :null => false
-      t.column :skip_on_error, :boolean, :default => false, :null => false
+      t.column :skip_on_error, :boolean, :default => true, :null => false
       t.column :error_message, :string
       t.column :filename, :string
       t.column :lock_version, :integer, :default => 0, :null => false

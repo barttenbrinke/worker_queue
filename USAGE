@@ -1,0 +1,98 @@
+As workerqueue is very flexible, there are many ways to use it.
+Below we have some examples on how to could be used.
+
+--------------------------------------------------------------------------------
+> How can I handle file uploads that need to be processed? --------------------------------------------------------------------------------
+We start by creating a ImportersController, which will handle the files.
+  ruby script/generate controller importers
+
+Open /app/controllers/importers_controller.rb
+  Class ImportersController < ApplicationController
+    # POST /importers
+    def create
+      if !params['upload']
+        render :text => 'No file was uploaded!', :status => 400
+        return
+      end
+    
+      begin
+        wq                  = WorkerQueue::WorkerQueueItem.new
+        wq.task_group       = 'file_importer'
+        wq.class_name       = 'Importer'
+        wq.method_name      = 'parse'
+        wq.task_name        = params['upload']['file'].original_filename
+        wq.data             = params['upload']['file'].read
+        wq.argument_hash    = { :original_filename =>
+                                param['upload']['file'].original_filename
+                              }
+        work.skip_on_error  = false
+        wq.save!
+
+        render :text => "OK", :status => 200
+      rescue Exception => e
+        render :text => "ERROR", :status => 500
+      end
+    end
+  end
+
+
+If a file is posted to /importers, it is placed into the database.
+When WorkerQueue.work is run, it executes the following command:
+  Importer.parse( :original_filename => 'file1.xml',
+                  :data => '<xml><a>somedata</a></xml>')
+
+Because of the task group, WorkerQueue will only execute 1 parse task at the
+time.  If files may be handled in parallel, remove the task_group line.
+
+When a parse task fails, it will continue to store files in the database,
+but stop processing them. If you do not want this, you can remove the
+skip_after_error line.
+
+
+--------------------------------------------------------------------------------
+> Can I use WorkerQueue to generate reports in the background?
+--------------------------------------------------------------------------------
+
+Add the following code to the report controller:
+
+  wq                = WorkerQueue::WorkerQueueItem.new
+  wq.task_group     = User.current_user
+  wq.task_name      = params['report_type']
+  wq.class_name     = 'ReportGenerator'
+  wq.method_name    = 'generate'
+  wq.argument_hash  = {
+                        :report_type => params['report_type'],
+                        :period => params['period'],
+                        :user => User.current_user
+                      }
+  wq.save!
+
+When WorkerQueue.work is run, it executes the following command:
+  ReportGenerator.generate( :report_type => :billing,
+                            :period => '2008-10', :user => @bob)
+
+With the task_group being the name of the user, the WorkerQueue will handle the report generation requests of user Bob
+one after the other.
+
+
+--------------------------------------------------------------------------------
+> Can I autmatically clear unused sessions in my database?
+--------------------------------------------------------------------------------
+First we start by generating a sweep sessions loader.
+ruby script/generate worker_queue_item_loader SweepSessions
+
+Open up /lib/worker_queue/sweep_sessions_loader.rb and change it to the
+following:
+
+  Class SweepSessionsLoader < WorkerQueue::WorkerQueueItemLoader
+    def self.prepare
+      work.class_name     = 'Session'
+      work.method_name    = 'sweep'
+      work.argument_hash  = '20m'
+    end
+  end
+
+If you change cron to call load and work, instead of just work WorkerQueue will
+automatically sweep your sessions for you.
+
+  rake workerqueue:load_and_work
