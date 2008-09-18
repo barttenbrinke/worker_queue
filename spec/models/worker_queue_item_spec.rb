@@ -50,7 +50,7 @@ describe "waiting tasks" do
     
     WorkerQueue.available_tasks.length.should eql(0)
   end
-  
+
   it "should order all waiting tasks in the correct order" do
     @worker_queue[0].task_group = 'other_group'
     @worker_queue[1].task_group = 'other_group'
@@ -60,6 +60,13 @@ describe "waiting tasks" do
     1.upto(6) do |number|
       queue[number].id.should > queue[number-1].id
     end
+  end
+
+  it "for all without specified type, should always be available" do
+    @worker_queue.each { |item| item.update_attribute( :task_group, '' ) }
+    @worker_queue[0].status = WorkerQueue::WorkerQueueItem::STATUS_RUNNING
+    @worker_queue[0].save
+    WorkerQueue.available_tasks.length.should eql(9)
   end
 
 end
