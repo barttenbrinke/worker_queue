@@ -40,7 +40,7 @@ class WorkerQueue
   # *<tt>tasks</tt> The tasks to evaluate. Defaults to WorkerQueueItem.waiting_tasks
   def self.available_tasks(tasks = WorkerQueue::WorkerQueueItem.waiting_tasks)
     running_tasks   = WorkerQueue::WorkerQueueItem.busy_tasks
-    running_groups  = running_tasks.collect{|x| x.task_group }.uniq.compact
+    running_groups  = running_tasks.collect{|x| x.task_group }.uniq.compact.reject{|grp| grp.empty? }
     
     (tasks - running_tasks).reject{|x| running_groups.include?(x.task_group)}
   end
